@@ -80,7 +80,7 @@ graphics() {
 						fi
 						start_term="exec startxfce4"
 			;;
-			"budgie")	DE+="budgie-desktop "
+			"budgie")	DE+="budgie-desktop arc-icon-theme arc-gtk-theme elementary-icon-theme "
 						if (dialog --yes-button "$yes" --no-button "$no" --yesno "\n$extra_msg6" 10 60) then
 							DE+="gnome "
 						fi
@@ -293,7 +293,7 @@ graphics() {
 		fi
 	done
 
-	DE+="$GPU xdg-user-dirs xorg-server xorg-apps xorg-xinit xterm ttf-dejavu gvfs pulseaudio pavucontrol pulseaudio-alsa alsa-utils unzip "
+	DE+="$GPU xdg-user-dirs xorg-server xorg-apps xorg-xinit xterm ttf-dejavu gvfs gvfs-smb gvfs-mtp pulseaudio pavucontrol pulseaudio-alsa alsa-utils unzip "
 	
 	if [ "$net_util" == "networkmanager" ] ; then
 		if (<<<"$DE" grep "plasma" &> /dev/null); then

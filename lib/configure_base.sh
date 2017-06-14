@@ -46,7 +46,7 @@ prepare_base() {
 			base_install="base-devel linux-headers " kernel="linux"
 		;;
 		"Arch-Linux-Hardened")
-			base_install="linux-hardened linux-hardened-headers " kernel="linux-hardened"
+			base_install="linux-hardened linux-hardened-headers sudo " kernel="linux-hardened"
 		;;
 		"Arch-Linux-Hardened-Devel")
 			base_install="base-devel linux-hardened linux-hardened-headers " kernel="linux-hardened"
@@ -58,7 +58,7 @@ prepare_base() {
 			base_install="base-devel linux-lts linux-lts-headers " kernel="linux-lts"
 		;;
 		"Arch-Linux-Zen")
-			base_install="linux-zen linux-zen-headers " kernel="linux-zen"
+			base_install="linux-zen linux-zen-headers sudo " kernel="linux-zen"
 		;;
 		"Arch-Linux-Zen-Devel")
 			base_install="base-devel linux-zen linux-zen-headers " kernel="linux-zen"
@@ -102,6 +102,7 @@ prepare_base() {
 				"grub"			"$loader_msg" \
 				"syslinux"		"$loader_msg1" \
 				"systemd-boot"	"$loader_msg2" \
+				"efistub"	    "$loader_msg3" \
 				"$none" "-" 3>&1 1>&2 2>&3)
 			ex="$?"
 		else
@@ -118,6 +119,8 @@ prepare_base() {
 			fi
 		elif [ "$bootloader" == "systemd-boot" ]; then
 			break
+		elif [ "$bootloader" == "efistub" ]; then
+			break
 		elif [ "$bootloader" == "syslinux" ]; then
 			if ! "$UEFI" ; then
 				if (tune2fs -l /dev/"$BOOT" | grep "64bit" &> /dev/null); then
@@ -128,7 +131,7 @@ prepare_base() {
 						mkfs.ext4 -O \^64bit /dev/"$BOOT"
 						mount /dev/"$BOOT" "$mnt") &> /dev/null &
 						pid=$! pri=0.1 msg="\n$boot_load \n\n \Z1> \Z2mkfs.ext4 -O ^64bit /dev/$BOOT\Zn" load
-						base_install+=" $bootloader"
+						base_install+="$bootloader "
 						break
 					fi
 				else
@@ -390,7 +393,6 @@ add_software() {
 				;;
 				"$terminal")
 					software=$(dialog --ok-button "$ok" --cancel-button "$cancel" --checklist "$software_msg1" 18 63 8 \
-						"fbterm"			"$term0" OFF \
 						"guake"             "$term1" OFF \
 						"kmscon"			"$term2" OFF \
 						"pantheon-terminal"	"$term3" OFF \

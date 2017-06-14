@@ -77,9 +77,9 @@ configure_system() {
 	fi
 
 	if "$crypted" && "$UEFI" ; then
-		echo "/dev/$BOOT              $esp           vfat         rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro        0       2" > "$ARCH"/etc/fstab
+		echo "/dev/$BOOT              $esp_mnt        vfat         rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro        0       2" > "$ARCH"/etc/fstab
 	elif "$crypted" ; then
-		echo "/dev/$BOOT              /boot           $FS         defaults        0       2" > "$ARCH"/etc/fstab
+		echo "/dev/$BOOT              /boot           ext4        defaults        0       2" > "$ARCH"/etc/fstab
 	fi
 
 	if "$crypted" ; then
@@ -94,6 +94,11 @@ configure_system() {
 		arch-chroot "$ARCH" mkinitcpio -p "$kernel") &> /dev/null &
 		pid=$! pri=1 msg="\n$encrypt_load1 \n\n \Z1> \Z2mkinitcpio -p $kernel\Zn" load
 		echo "$(date -u "+%F %H:%M") : Configure system for encryption" >> "$log"
+	else
+                (sed -i 's/HOOKS=.*/HOOKS="base udev autodetect keyboard keymap consolefont modconf block lvm2 filesystems fsck"/' "$ARCH"/etc/mkinitcpio.conf
+                arch-chroot "$ARCH" mkinitcpio -p "$kernel") &> /dev/null &
+                pid=$! pri=1 msg="\n$kernel_config_load \n\n \Z1> \Z2mkinitcpio -p $kernel\Zn" load
+                echo "$(date -u "+%F %H:%M") : Configure system with the default mkinitcpio hooks" >> "$log"
 	fi
 
 	(sed -i -e "s/#$LOCALE/$LOCALE/" "$ARCH"/etc/locale.gen
